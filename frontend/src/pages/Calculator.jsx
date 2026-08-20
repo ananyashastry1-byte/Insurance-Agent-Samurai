@@ -3,8 +3,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Calculator.css";
 
-function Calculator() {
+const API = "https://insurance-agent-samurai-api.onrender.com/api";
 
+function Calculator() {
     const navigate = useNavigate();
 
     const [form, setForm] = useState({
@@ -16,6 +17,7 @@ function Calculator() {
 
     const [result, setResult] = useState(null);
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setForm({
@@ -25,34 +27,38 @@ function Calculator() {
     };
 
     const calculate = async (e) => {
-
         e.preventDefault();
 
         setError("");
         setResult(null);
+        setLoading(true);
 
         try {
-
             const response = await axios.post(
-                "http://localhost:8080/api/premium/calculate",
+                `${API}/premium/calculate`,
                 {
                     age: Number(form.age),
                     insuranceType: form.insuranceType,
-                    coverageAmount: Number(
-                        form.coverageAmount
-                    ),
+                    coverageAmount: Number(form.coverageAmount),
                     policyTerm: Number(form.policyTerm)
                 }
             );
 
+            console.log("Premium calculation response:", response.data);
+
             setResult(response.data);
 
         } catch (err) {
+            console.error("Premium calculation error:", err);
 
             setError(
                 err.response?.data?.message ||
+                err.response?.data?.error ||
                 "Unable to calculate premium."
             );
+
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -69,6 +75,7 @@ function Calculator() {
                 </div>
 
                 <button
+                    type="button"
                     onClick={() => navigate("/dashboard")}
                 >
                     ← Dashboard
@@ -104,6 +111,7 @@ function Calculator() {
                         name="insuranceType"
                         value={form.insuranceType}
                         onChange={handleChange}
+                        required
                     >
                         <option value="life">Life</option>
                         <option value="health">Health</option>
@@ -116,6 +124,7 @@ function Calculator() {
                     <input
                         type="number"
                         name="coverageAmount"
+                        min="0"
                         placeholder="Example: 1000000"
                         value={form.coverageAmount}
                         onChange={handleChange}
@@ -141,8 +150,13 @@ function Calculator() {
                         </div>
                     )}
 
-                    <button type="submit">
-                        Calculate Premium
+                    <button
+                        type="submit"
+                        disabled={loading}
+                    >
+                        {loading
+                            ? "Calculating..."
+                            : "Calculate Premium"}
                     </button>
 
                 </form>
@@ -152,26 +166,32 @@ function Calculator() {
                     <h2>Estimated Premium</h2>
 
                     {!result ? (
+
                         <div className="no-result">
                             Enter customer and policy details
                             to calculate an estimate.
                         </div>
+
                     ) : (
 
                         <>
 
                             <div className="premium-value">
-                                ₹{Number(
-                                    result.estimatedMonthlyPremium
+                                ₹
+                                {Number(
+                                    result.estimatedMonthlyPremium || 0
                                 ).toLocaleString("en-IN")}
                             </div>
 
-                            <p>Estimated Monthly Premium</p>
+                            <p>
+                                Estimated Monthly Premium
+                            </p>
 
                             <div className="result-details">
 
                                 <div>
                                     <span>Insurance</span>
+
                                     <strong>
                                         {result.insuranceType}
                                     </strong>
@@ -179,6 +199,7 @@ function Calculator() {
 
                                 <div>
                                     <span>Age</span>
+
                                     <strong>
                                         {result.age}
                                     </strong>
@@ -186,15 +207,18 @@ function Calculator() {
 
                                 <div>
                                     <span>Coverage</span>
+
                                     <strong>
-                                        ₹{Number(
-                                            result.coverageAmount
+                                        ₹
+                                        {Number(
+                                            result.coverageAmount || 0
                                         ).toLocaleString("en-IN")}
                                     </strong>
                                 </div>
 
                                 <div>
                                     <span>Term</span>
+
                                     <strong>
                                         {result.policyTerm} years
                                     </strong>
@@ -202,9 +226,11 @@ function Calculator() {
 
                             </div>
 
-                            <div className="estimate-note">
-                                ⚠️ {result.note}
-                            </div>
+                            {result.note && (
+                                <div className="estimate-note">
+                                    ⚠️ {result.note}
+                                </div>
+                            )}
 
                         </>
 
