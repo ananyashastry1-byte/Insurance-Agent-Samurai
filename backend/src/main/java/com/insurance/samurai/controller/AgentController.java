@@ -11,7 +11,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/agents")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(
+    origins = {
+        "http://localhost:5173",
+        "https://insurance-agent-samurai.onrender.com"
+    }
+)
 public class AgentController {
 
     private final AgentService agentService;
