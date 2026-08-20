@@ -11,7 +11,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/policies")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(
+    origins = {
+        "http://localhost:5173",
+        "https://insurance-agent-samurai.onrender.com"
+    }
+)
 public class PolicyController {
 
     private final PolicyService policyService;
