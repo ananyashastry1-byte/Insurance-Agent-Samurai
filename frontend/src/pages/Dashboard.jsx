@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Dashboard.css";
 
-const API = "http://localhost:8080/api";
+const API = "https://insurance-agent-samurai-api.onrender.com/api";
 
 function Dashboard() {
 

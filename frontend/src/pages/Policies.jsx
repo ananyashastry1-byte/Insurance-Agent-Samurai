@@ -3,7 +3,18 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Policies.css";
 
-const API = "http://localhost:8080/api";
+const API = "https://insurance-agent-samurai-api.onrender.com/api";
+
+const emptyForm = {
+    policyName: "",
+    policyType: "Life",
+    description: "",
+    basePremium: "",
+    minimumCoverage: "",
+    minimumAge: 18,
+    maximumAge: 65,
+    active: true
+};
 
 function Policies() {
 
@@ -15,18 +26,9 @@ function Policies() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const [form, setForm] = useState({
-        policyName: "",
-        policyType: "Life",
-        description: "",
-        basePremium: "",
-        minimumCoverage: "",
-        minimumAge: 18,
-        maximumAge: 65,
-        active: true
-    });
-
+    const [form, setForm] = useState(emptyForm);
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState(null);
 
     const loadPolicies = async () => {
         try {
@@ -97,48 +99,106 @@ function Policies() {
     };
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+
+        const {
+            name,
+            value,
+            type,
+            checked
+        } = e.target;
 
         setForm({
             ...form,
-            [name]: type === "checkbox" ? checked : value
+            [name] :
+                type === "checkbox"
+                    ? checked
+                    : value
         });
     };
 
-    const createPolicy = async (e) => {
+
+    const openAddForm = () => {
+
+        setEditingId(null);
+        setForm(emptyForm);
+        setShowForm(true);
+    };
+
+    const openEditForm = (policy) => {
+
+        setEditingId(policy.id);
+
+        setForm({
+            policyName: policy.policyName || "",
+            policyType: policy.policyType || "Life",
+            description: policy.description || "",
+            basePremium: policy.basePremium ?? "",
+            minimumCoverage: policy.minimumCoverage ?? "",
+            minimumAge: policy.minimumAge ?? 18,
+            maximumAge: policy.maximumAge ?? 65,
+            active: policy.active ?? true
+        });
+
+        setShowForm(true);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    };
+
+    const closeForm = () => {
+
+        setShowForm(false);
+        setEditingId(null);
+        setForm(emptyForm);
+    };
+
+    const savePolicy = async (e) => {
 
         e.preventDefault();
 
+        const policyData = {
+            ...form,
+            basePremium: Number(form.basePremium),
+            minimumCoverage: Number(form.minimumCoverage),
+            minimumAge: Number(form.minimumAge),
+            maximumAge: Number(form.maximumAge)
+        };
+
         try {
 
-            await axios.post(
-                `${API}/policies`,
-                {
-                    ...form,
-                    basePremium: Number(form.basePremium),
-                    minimumCoverage: Number(form.minimumCoverage),
-                    minimumAge: Number(form.minimumAge),
-                    maximumAge: Number(form.maximumAge)
-                }
-            );
+            if (editingId) {
 
-            setShowForm(false);
+                await axios.put(
+                    `${API}/policies/${editingId}`,
+                    policyData
+                );
 
-            setForm({
-                policyName: "",
-                policyType: "Life",
-                description: "",
-                basePremium: "",
-                minimumCoverage: "",
-                minimumAge: 18,
-                maximumAge: 65,
-                active: true
-            });
+                alert("Policy updated successfully.");
 
+            } else {
+
+                await axios.post(
+                    `${API}/policies`,
+                    policyData
+                );
+
+                alert("Policy created successfully.");
+            }
+
+            closeForm();
             loadPolicies();
 
         } catch (err) {
-            alert("Could not create policy.");
+
+            console.error(err);
+
+            alert(
+                editingId
+                    ? "Could not update policy."
+                    : "Could not create policy."
+            );
         }
     };
 
@@ -149,9 +209,15 @@ function Policies() {
         }
 
         try {
-            await axios.delete(`${API}/policies/${id}`);
+
+            await axios.delete(
+                `${API}/policies/${id}`
+            );
+
             loadPolicies();
+
         } catch {
+
             alert("Could not delete policy.");
         }
     };
@@ -163,10 +229,17 @@ function Policies() {
 
                 <div>
                     <h1>📋 Insurance Policies</h1>
-                    <p>Manage your insurance policy catalog.</p>
+
+                    <p>
+                        Manage your insurance policy catalog.
+                    </p>
                 </div>
 
-                <button onClick={() => navigate("/dashboard")}>
+                <button
+                    onClick={() =>
+                        navigate("/dashboard")
+                    }
+                >
                     ← Dashboard
                 </button>
 
@@ -178,7 +251,9 @@ function Policies() {
                     type="text"
                     placeholder="Search policy name..."
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) =>
+                        setSearch(e.target.value)
+                    }
                 />
 
                 <button onClick={searchByName}>
@@ -187,18 +262,34 @@ function Policies() {
 
                 <select
                     value={type}
-                    onChange={(e) => searchByType(e.target.value)}
+                    onChange={(e) =>
+                        searchByType(e.target.value)
+                    }
                 >
-                    <option value="">All Types</option>
-                    <option value="Life">Life</option>
-                    <option value="Health">Health</option>
-                    <option value="Vehicle">Vehicle</option>
-                    <option value="Home">Home</option>
+                    <option value="">
+                        All Types
+                    </option>
+
+                    <option value="Life">
+                        Life
+                    </option>
+
+                    <option value="Health">
+                        Health
+                    </option>
+
+                    <option value="Vehicle">
+                        Vehicle
+                    </option>
+
+                    <option value="Home">
+                        Home
+                    </option>
                 </select>
 
                 <button
                     className="add-button"
-                    onClick={() => setShowForm(!showForm)}
+                    onClick={openAddForm}
                 >
                     + Add Policy
                 </button>
@@ -206,12 +297,28 @@ function Policies() {
             </div>
 
             {showForm && (
+
                 <form
                     className="policy-form"
-                    onSubmit={createPolicy}
+                    onSubmit={savePolicy}
                 >
 
-                    <h2>Add Insurance Policy</h2>
+                    <div className="form-header">
+
+                        <h2>
+                            {editingId
+                                ? "Edit Insurance Policy"
+                                : "Add Insurance Policy"}
+                        </h2>
+
+                        <button
+                            type="button"
+                            onClick={closeForm}
+                        >
+                            ✕
+                        </button>
+
+                    </div>
 
                     <input
                         name="policyName"
@@ -246,6 +353,7 @@ function Policies() {
                         placeholder="Base premium"
                         value={form.basePremium}
                         onChange={handleChange}
+                        min="0"
                         required
                     />
 
@@ -255,6 +363,7 @@ function Policies() {
                         placeholder="Minimum coverage"
                         value={form.minimumCoverage}
                         onChange={handleChange}
+                        min="0"
                         required
                     />
 
@@ -266,6 +375,7 @@ function Policies() {
                             placeholder="Minimum age"
                             value={form.minimumAge}
                             onChange={handleChange}
+                            min="1"
                             required
                         />
 
@@ -275,35 +385,63 @@ function Policies() {
                             placeholder="Maximum age"
                             value={form.maximumAge}
                             onChange={handleChange}
+                            min="1"
                             required
                         />
 
                     </div>
 
                     <label className="checkbox-label">
+
                         <input
                             type="checkbox"
                             name="active"
                             checked={form.active}
                             onChange={handleChange}
                         />
+
                         Active policy
+
                     </label>
 
-                    <button type="submit">
-                        Save Policy
-                    </button>
+                    <div className="form-buttons">
+
+                        <button type="submit">
+                            {editingId
+                                ? "Update Policy"
+                                : "Save Policy"}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={closeForm}
+                        >
+                            Cancel
+                        </button>
+
+                    </div>
 
                 </form>
             )}
 
             {error && (
-                <div className="page-error">{error}</div>
+                <div className="page-error">
+                    {error}
+                </div>
             )}
 
             {loading ? (
+
                 <p>Loading policies...</p>
+
+            ) : policies.length === 0 ? (
+
+                <div className="empty-state">
+                    No policies found.
+                </div>
+
             ) : (
+
                 <div className="policy-grid">
 
                     {policies.map((policy) => (
@@ -314,29 +452,40 @@ function Policies() {
                         >
 
                             <div className="policy-card-header">
+
                                 <span className="policy-type">
                                     {policy.policyType}
                                 </span>
 
-                                <span className={
-                                    policy.active
-                                        ? "active"
-                                        : "inactive"
-                                }>
+                                <span
+                                    className={
+                                        policy.active
+                                            ? "active"
+                                            : "inactive"
+                                    }
+                                >
                                     {policy.active
                                         ? "Active"
                                         : "Inactive"}
                                 </span>
+
                             </div>
 
-                            <h2>{policy.policyName}</h2>
+                            <h2>
+                                {policy.policyName}
+                            </h2>
 
-                            <p>{policy.description}</p>
+                            <p>
+                                {policy.description}
+                            </p>
 
                             <div className="policy-details">
 
                                 <div>
-                                    <small>Base Premium</small>
+                                    <small>
+                                        Base Premium
+                                    </small>
+
                                     <strong>
                                         ₹{Number(
                                             policy.basePremium
@@ -345,7 +494,10 @@ function Policies() {
                                 </div>
 
                                 <div>
-                                    <small>Coverage</small>
+                                    <small>
+                                        Coverage
+                                    </small>
+
                                     <strong>
                                         ₹{Number(
                                             policy.minimumCoverage
@@ -354,23 +506,42 @@ function Policies() {
                                 </div>
 
                                 <div>
-                                    <small>Age</small>
+                                    <small>
+                                        Age
+                                    </small>
+
                                     <strong>
-                                        {policy.minimumAge} -{" "}
+                                        {policy.minimumAge}
+                                        {" - "}
                                         {policy.maximumAge}
                                     </strong>
                                 </div>
 
                             </div>
 
-                            <button
-                                className="delete-button"
-                                onClick={() =>
-                                    deletePolicy(policy.id)
-                                }
-                            >
-                                Delete
-                            </button>
+                            <div className="policy-actions">
+
+                                <button
+                                    className="edit-button"
+                                    onClick={() =>
+                                        openEditForm(policy)
+                                    }
+                                >
+                                    ✏️ Edit
+                                </button>
+
+                                <button
+                                    className="delete-button"
+                                    onClick={() =>
+                                        deletePolicy(
+                                            policy.id
+                                        )
+                                    }
+                                >
+                                    🗑️ Delete
+                                </button>
+
+                            </div>
 
                         </div>
 

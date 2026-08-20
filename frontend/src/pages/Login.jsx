@@ -7,21 +7,31 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+
         setError("");
+        setLoading(true);
 
         try {
             const response = await axios.post(
-                "http://localhost:8080/api/agents/login",
+                "https://insurance-agent-samurai-api.onrender.com/api/agents/login",
                 {
                     email,
                     password
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
                 }
             );
+
+            console.log("Login response:", response.data);
 
             localStorage.setItem(
                 "agent",
@@ -31,10 +41,42 @@ function Login() {
             navigate("/dashboard");
 
         } catch (err) {
-            setError(
-                err.response?.data?.error ||
-                "Invalid email or password"
-            );
+            console.error("Login error:", err);
+
+            if (err.response) {
+                console.error(
+                    "Status:",
+                    err.response.status
+                );
+
+                console.error(
+                    "Response:",
+                    err.response.data
+                );
+
+                if (typeof err.response.data === "string") {
+                    setError(err.response.data);
+                } else {
+                    setError(
+                        err.response.data?.error ||
+                        err.response.data?.message ||
+                        `Login failed (${err.response.status})`
+                    );
+                }
+
+            } else if (err.request) {
+                setError(
+                    "Could not connect to the server. Please try again."
+                );
+
+            } else {
+                setError(
+                    "Login failed. Please try again."
+                );
+            }
+
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -47,7 +89,9 @@ function Login() {
                     🛡️
                 </div>
 
-                <h1>Insurance Agent Samurai</h1>
+                <h1>
+                    Insurance Agent Samurai
+                </h1>
 
                 <p className="subtitle">
                     Insurance Agent Portal
@@ -55,7 +99,9 @@ function Login() {
 
                 <form onSubmit={handleLogin}>
 
-                    <label>Email</label>
+                    <label>
+                        Email
+                    </label>
 
                     <input
                         type="email"
@@ -67,7 +113,9 @@ function Login() {
                         required
                     />
 
-                    <label>Password</label>
+                    <label>
+                        Password
+                    </label>
 
                     <input
                         type="password"
@@ -85,16 +133,22 @@ function Login() {
                         </div>
                     )}
 
-                    <button type="submit">
-                        Login
+                    <button
+                        type="submit"
+                        disabled={loading}
+                    >
+                        {loading
+                            ? "Logging in..."
+                            : "Login"}
                     </button>
 
                 </form>
 
                 <p className="register-text">
                     Don't have an account?
+
                     <Link to="/register">
-                        Register
+                        {" "}Register
                     </Link>
                 </p>
 

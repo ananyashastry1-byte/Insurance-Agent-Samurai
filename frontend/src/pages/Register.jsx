@@ -15,6 +15,7 @@ function Register() {
 
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setForm({
@@ -25,26 +26,71 @@ function Register() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
+
         setError("");
         setSuccess("");
+        setLoading(true);
 
         try {
-            await axios.post(
-                "http://localhost:8080/api/agents/register",
-                form
+            const response = await axios.post(
+                "https://insurance-agent-samurai-api.onrender.com/api/agents/register",
+                form,
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
             );
 
-            setSuccess("Registration successful! You can now login.");
+            console.log("Registration response:", response.data);
+
+            setSuccess(
+                "Registration successful! You can now login."
+            );
 
             setTimeout(() => {
                 navigate("/login");
             }, 1500);
 
         } catch (err) {
-            setError(
-                err.response?.data?.error ||
-                "Registration failed"
-            );
+            console.error("Registration error:", err);
+
+            if (err.response) {
+                console.error(
+                    "Status:",
+                    err.response.status
+                );
+
+                console.error(
+                    "Response:",
+                    err.response.data
+                );
+
+                if (typeof err.response.data === "string") {
+                    setError(err.response.data);
+                } else {
+                    setError(
+                        err.response.data?.error ||
+                        err.response.data?.message ||
+                        `Registration failed (${err.response.status})`
+                    );
+                }
+
+            } else if (err.request) {
+
+                setError(
+                    "Could not connect to the server. Please try again."
+                );
+
+            } else {
+
+                setError(
+                    "Registration failed. Please try again."
+                );
+            }
+
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -53,9 +99,13 @@ function Register() {
 
             <div className="register-card">
 
-                <div className="register-logo">🛡️</div>
+                <div className="register-logo">
+                    🛡️
+                </div>
 
-                <h1>Create Agent Account</h1>
+                <h1>
+                    Create Agent Account
+                </h1>
 
                 <p className="register-subtitle">
                     Join Insurance Agent Samurai
@@ -63,7 +113,9 @@ function Register() {
 
                 <form onSubmit={handleRegister}>
 
-                    <label>Full Name</label>
+                    <label>
+                        Full Name
+                    </label>
 
                     <input
                         type="text"
@@ -74,7 +126,9 @@ function Register() {
                         required
                     />
 
-                    <label>Email</label>
+                    <label>
+                        Email
+                    </label>
 
                     <input
                         type="email"
@@ -85,7 +139,9 @@ function Register() {
                         required
                     />
 
-                    <label>Phone</label>
+                    <label>
+                        Phone
+                    </label>
 
                     <input
                         type="text"
@@ -94,10 +150,13 @@ function Register() {
                         value={form.phone}
                         onChange={handleChange}
                         pattern="[0-9]{10}"
+                        maxLength="10"
                         required
                     />
 
-                    <label>Password</label>
+                    <label>
+                        Password
+                    </label>
 
                     <input
                         type="password"
@@ -105,6 +164,7 @@ function Register() {
                         placeholder="Create password"
                         value={form.password}
                         onChange={handleChange}
+                        minLength="6"
                         required
                     />
 
@@ -120,15 +180,22 @@ function Register() {
                         </div>
                     )}
 
-                    <button type="submit">
-                        Create Account
+                    <button
+                        type="submit"
+                        disabled={loading}
+                    >
+                        {loading
+                            ? "Creating Account..."
+                            : "Create Account"}
                     </button>
 
                 </form>
 
                 <p className="login-link">
                     Already have an account?
-                    <Link to="/login"> Login</Link>
+                    <Link to="/login">
+                        {" "}Login
+                    </Link>
                 </p>
 
             </div>
