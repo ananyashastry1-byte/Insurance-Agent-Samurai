@@ -1,0 +1,190 @@
+.policies-page {
+    min-height: 100vh;
+    background: #f1f5f9;
+    padding: 30px;
+    font-family: Arial, sans-serif;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-header h1 {
+    color: #172554;
+}
+
+.page-header p {
+    color: #64748b;
+}
+
+.page-header button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 7px;
+    background: #172554;
+    color: white;
+    cursor: pointer;
+}
+
+.policy-toolbar {
+    background: white;
+    padding: 20px;
+    margin: 25px 0;
+    border-radius: 12px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.policy-toolbar input,
+.policy-toolbar select {
+    padding: 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+}
+
+.policy-toolbar input {
+    flex: 1;
+    min-width: 220px;
+}
+
+.policy-toolbar button {
+    padding: 11px 18px;
+    border: none;
+    border-radius: 7px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+.policy-toolbar .add-button {
+    background: #16a34a;
+}
+
+.policy-form {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.policy-form h2 {
+    color: #172554;
+}
+
+.policy-form input,
+.policy-form select,
+.policy-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px;
+    margin: 7px 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+}
+
+.policy-form textarea {
+    min-height: 90px;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.checkbox-label {
+    display: block;
+    margin: 10px 0;
+}
+
+.checkbox-label input {
+    width: auto;
+}
+
+.policy-form button {
+    padding: 11px 20px;
+    border: none;
+    border-radius: 7px;
+    background: #2563eb;
+    color: white;
+}
+
+.policy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 20px;
+}
+
+.policy-card {
+    background: white;
+    padding: 22px;
+    border-radius: 13px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .07);
+}
+
+.policy-card-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.policy-type {
+    color: #2563eb;
+    font-weight: bold;
+}
+
+.active {
+    color: #16a34a;
+}
+
+.inactive {
+    color: #dc2626;
+}
+
+.policy-card h2 {
+    color: #172554;
+}
+
+.policy-card p {
+    color: #64748b;
+    min-height: 45px;
+}
+
+.policy-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.policy-details small,
+.policy-details strong {
+    display: block;
+}
+
+.policy-details small {
+    color: #64748b;
+}
+
+.policy-details strong {
+    margin-top: 5px;
+    color: #172554;
+}
+
+.delete-button {
+    width: 100%;
+    padding: 9px;
+    border: none;
+    border-radius: 7px;
+    background: #fee2e2;
+    color: #b91c1c;
+    cursor: pointer;
+}
+
+.page-error {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 12px;
+    border-radius: 7px;
+}

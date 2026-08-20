@@ -1,0 +1,11 @@
+backend/target/
+frontend/node_modules/
+frontend/dist/
+*.class
+.env
+.env.*
+application-local.properties
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

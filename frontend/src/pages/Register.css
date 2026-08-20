@@ -1,0 +1,89 @@
+.register-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
+    font-family: Arial, sans-serif;
+}
+
+.register-card {
+    width: 420px;
+    padding: 38px;
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.register-logo {
+    text-align: center;
+    font-size: 42px;
+}
+
+.register-card h1 {
+    text-align: center;
+    color: #172554;
+    margin-bottom: 8px;
+}
+
+.register-subtitle {
+    text-align: center;
+    color: #64748b;
+    margin-bottom: 25px;
+}
+
+.register-card label {
+    display: block;
+    margin-top: 13px;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #334155;
+}
+
+.register-card input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+}
+
+.register-card button {
+    width: 100%;
+    margin-top: 22px;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.register-error,
+.register-success {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 7px;
+}
+
+.register-error {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.register-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-link a {
+    color: #2563eb;
+    font-weight: bold;
+    text-decoration: none;
+}
